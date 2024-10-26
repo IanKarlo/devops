@@ -8,6 +8,8 @@ RUN npm i
 
 COPY . .
 
+ENV NODE_ENV=Production
+
 RUN npm run build
 
 RUN rm -rf src/
