@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog SPA</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/4.1.0/cdn.min.js" integrity="sha512-bz58Sg3BAWMEMPTH0B8+pK/+5Qfqq6b2Ho2G4ld12x4fiUVqpY8jSbN/73qpBQYFLU4QnKVL5knUm4uqcJGLVw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between">
+                <div class="flex space-x-7">
+                    <a href="#" class="flex items-center py-4 px-2">
+                        <span class="font-semibold text-gray-500 text-lg">Blog SPA</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="#" onclick="showPage('posts')" class="py-4 px-2 text-gray-500 font-semibold hover:text-green-500 transition duration-300">Posts</a>
+                    <a href="#" onclick="showPage('create')" class="py-2 px-4 font-medium text-white bg-green-500 rounded hover:bg-green-400 transition duration-300">Novo Post</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Lista de Posts -->
+    <div id="posts-page" class="max-w-6xl mx-auto px-4 py-8">
+        <div id="posts-container" class="space-y-6">
+            <!-- Posts serão inseridos aqui -->
+        </div>
+    </div>
+
+    <!-- Página de Criação -->
+    <div id="create-page" class="max-w-6xl mx-auto px-4 py-8 hidden">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-6">Criar Novo Post</h2>
+            <form id="post-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Título</label>
+                    <input type="text" id="title" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Conteúdo</label>
+                    <textarea id="content" required rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                    Publicar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        const ENVS = {
+            local: {
+                api_url: 'http://localhost:3000',
+            },
+            prod: {
+                api_url: 'http://your-production-api-url.com',
+            }
+        }
+
+        const env = window.location.href.includes('localhost') ? ENVS.local : ENVS.prod
+
+
+        // Estado da aplicação
+        let posts = []
+
+        async function getPosts() {
+            const response = await fetch(env.api_url + '/api/posts');
+            const data = await response.json();
+            posts = data;
+            renderPosts();
+        }
+
+        // Funções de navegação
+        function showPage(page) {
+            document.getElementById('posts-page').classList.toggle('hidden', page !== 'posts');
+            document.getElementById('create-page').classList.toggle('hidden', page !== 'create');
+            if (page === 'posts') {
+                renderPosts();
+            }
+        }
+
+        // Renderizar posts
+        async function renderPosts() {
+            const container = document.getElementById('posts-container');
+            container.innerHTML = '';
+
+            await getPosts();
+            
+            posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .forEach(post => {
+                    const formattedDate = dateFns.format(new Date(post.createdAt), 'dd/MM/yyyy HH:mm');
+                    const article = document.createElement('article');
+                    article.className = 'bg-white rounded-lg shadow-md p-6';
+                    article.innerHTML = `
+                        <h2 class="text-xl font-bold mb-2">${post.title}</h2>
+                        <p class="text-gray-600 mb-4">${post.content}</p>
+                        <time class="text-sm text-gray-500">${formattedDate}</time>
+                    `;
+                    container.appendChild(article);
+                });
+        }
+
+        // Manipular criação de post
+        document.getElementById('post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            
+            const response = await fetch(env.api_url + '/api/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, content })
+            })
+
+            console.log(response)
+            
+            await getPosts()
+            
+            document.getElementById('post-form').reset();
+            showPage('posts');
+        });
+
+        // Inicializar na página de posts
+        showPage('posts');
+    </script>
+</body>
+</html>
