@@ -20,7 +20,7 @@ resource "linode_instance" "jenkins" {
   image           = "linode/ubuntu22.04"
   region          = "us-central"
   type            = "g6-standard-1"
-  root_pass       = "Ikts@34924517"
+  root_pass       = var.jenkins_root_pwd
   tags       = ["jenkins", "devops"]
 }
 
