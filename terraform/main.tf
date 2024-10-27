@@ -16,40 +16,40 @@ provider "linode" {
 #Resources
 
 resource "linode_instance" "jenkins" {
-  label           = "jenkins"
-  image           = "linode/ubuntu22.04"
-  region          = "us-central"
-  type            = "g6-standard-1"
-  root_pass       = var.jenkins_root_pwd
-  tags       = ["jenkins", "devops"]
+  label     = "jenkins"
+  image     = "linode/ubuntu22.04"
+  region    = "us-central"
+  type      = "g6-standard-1"
+  root_pass = var.jenkins_root_pwd
+  tags      = ["jenkins", "devops"]
 }
 
 resource "linode_lke_cluster" "k8s" {
-    label       = "k8s"
-    k8s_version = "1.31"
-    region      = "us-central"
-    tags        = ["app", "devops"]
+  label       = "k8s"
+  k8s_version = "1.31"
+  region      = "us-central"
+  tags        = ["app", "devops"]
 
-    pool {
-        type  = "g6-standard-1"
-        count = 2
-    }
+  pool {
+    type  = "g6-standard-1"
+    count = 2
+  }
 }
 
 #Variables
 
 variable "region" {
-  type = string
+  type    = string
   default = "us-central"
 }
 
 variable "linode_api_key" { # lembrar de criar um arquivo tfvars e colocar a key =)
-  type = string
+  type    = string
   default = ""
 }
 
 variable "jenkins_root_pwd" { # lembrar de criar um arquivo tfvars e colocar a password =)
-  type = string
+  type    = string
   default = ""
 }
 
