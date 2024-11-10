@@ -22,7 +22,7 @@ spec:
         env:
           - name: DB_HOST
             value: database
-        image: iankts/simple-blog:latest
+        image: iankts/simple-blog:{{TAG}}
         resources:
           limits:
             memory: "128Mi"
