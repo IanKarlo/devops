@@ -40,7 +40,7 @@ spec:
   ports:
   - port: 80
     targetPort: 3000
-    nodePort: 30000
-    protocol: TCP
-  type: NodePort
+    # nodePort: 30000
+    # protocol: TCP
+  type: LoadBalancer
 

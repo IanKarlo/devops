@@ -22,6 +22,7 @@ resource "linode_instance" "jenkins" {
   type      = "g6-standard-1"
   root_pass = var.jenkins_root_pwd
   tags      = ["jenkins", "devops"]
+  authorized_keys = [data.linode_sshkey.jenkins_ssh.ssh_key]
 }
 
 resource "linode_lke_cluster" "k8s" {
@@ -34,6 +35,12 @@ resource "linode_lke_cluster" "k8s" {
     type  = "g6-standard-1"
     count = 2
   }
+}
+
+# Data
+
+data "linode_sshkey" "jenkins_ssh" {
+  label = "devops-ssh"
 }
 
 #Variables
